@@ -55,11 +55,29 @@
 
 (defn law-path [law-id] (str laws-dir "/" law-id ".json"))
 
+(defn law-data?
+  "A law_data response must be JSON carrying a law_full_text. e-Gov serves its
+   HTML 'page not found' page with HTTP 200 when it is under load, so the
+   status code decides nothing here -- see the note on lib/fetch-buffer."
+  [^js buf]
+  (let [s (.toString buf "utf8" 0 (min 200 (.-length buf)))]
+    (and (str/starts-with? (str/triml s) "{")
+         (try (some? (.-law_full_text (js/JSON.parse (.toString buf))))
+              (catch :default _ false)))))
+
+(defn valid-on-disk?
+  "A previously written file counts as done only if it still validates.
+   Without this, a resumed run happily keeps 8,548 saved error pages."
+  [p]
+  (and (exists? p)
+       (pos? (file-size p))
+       (law-data? (.readFileSync (js/require "fs") p))))
+
 (defn fetch-one [law-id]
   (let [p (law-path law-id)]
-    (if (and (exists? p) (pos? (file-size p)))
+    (if (valid-on-disk? p)
       (js/Promise.resolve {:law-id law-id :skipped true})
-      (-> (fetch-buffer (str api "/law_data/" law-id))
+      (-> (fetch-buffer (str api "/law_data/" law-id) {:tries 5 :validate law-data?})
           (.then (fn [{:keys [ok buf status error]}]
                    (if ok
                      (do (write-file! p buf)

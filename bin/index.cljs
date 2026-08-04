@@ -119,6 +119,21 @@
                  :catalog/license-tier :tier/a
                  :catalog/scope "e-Gov 法令検索が提供する全法令(憲法・法律・政令・勅令・府省令・規則)の現行改正版全文"
                  :catalog/complete-as-a-class true
+                 ;; Laws that /laws lists but /law_data will not serve. e-Gov
+                 ;; answers these with a real 404 and code 404004
+                 ;; ("指定のパラメータで取得できるデータがありません"), retried
+                 ;; individually at pool 1. Listed by id rather than summarised
+                 ;; as a count: a reader checking one of these must be able to
+                 ;; tell "upstream has no data" from "the fetch dropped it".
+                 :catalog/known-gaps
+                 [{:gap :law-data-unavailable-upstream
+                   :count (count (remove :text/path rows))
+                   :law-ids (vec (sort (map :law/local-id (remove :text/path rows))))
+                   :note "listed by GET /api/2/laws, but GET /api/2/law_data/<id> returns HTTP 404 code 404004"}
+                  {:gap :in-text-citations
+                   :note "Japanese law XML references other laws by 法令番号 string, not by URI, so text-derived citation edges need name resolution; only :amends (from revision metadata) is extracted"}
+                  {:gap :case-law
+                   :note "courts.go.jp is a separate source and out of this dataset's scope"}]
                  :catalog/files
                  (into [{:path (str raw "/law-list.json")
                          :sha256 (sha256-file (str raw "/law-list.json"))
