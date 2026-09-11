@@ -38,7 +38,7 @@
 
 つまり**下流のどの件数チェックにも引っかかりません**。発覚したのは、git-annex が 9,537 ファイルを **989 個の key に重複排除**したのを見たときです。
 
-対策は `bin/lib.cljs` の `fetch-buffer` に `:validate` を足し、2xx でも本文検査に落ちたら 5xx と同じ backoff で再試行すること。`bin/fetch.cljs` は「JSON であり `law_full_text` を持つ」ことを要求し、**ディスク上の既存ファイルも検証してから skip** します（でないと再開のたびに保存済みエラーページを温存する）。
+対策は `bin/lib.cljk` の `fetch-buffer` に `:validate` を足し、2xx でも本文検査に落ちたら 5xx と同じ backoff で再試行すること。`bin/fetch.cljk` は「JSON であり `law_full_text` を持つ」ことを要求し、**ディスク上の既存ファイルも検証してから skip** します（でないと再開のたびに保存済みエラーページを温存する）。
 
 ## 依存辺の出どころ
 
@@ -56,10 +56,10 @@ e-Gov 法令API の利用は **政府標準利用規約（第2.0版）**＝ CC B
 ## 再取得 / 再生成
 
 ```bash
-nbb --classpath bin bin/fetch.cljs --pool 3   # raw/ を取得（検証済みの既存ファイルは skip、中断しても再開可）
-nbb --classpath bin bin/index.cljs            # index/ と raw/source-catalog.edn を再生成
+nbb --classpath bin bin/fetch.cljk --pool 3   # raw/ を取得（検証済みの既存ファイルは skip、中断しても再開可）
+nbb --classpath bin bin/index.cljk            # index/ と raw/source-catalog.edn を再生成
 ```
 
 **pool は 3 以下にしてください。** pool 6 でソフト 404 が大量発生しました（上記）。検証があるので今は静かに壊れませんが、その分リトライで遅くなります。残った失敗は `--pool 1` で再実行すると大半が埋まります（実測: 82 → 13）。
 
-`bin/fetch.cljs` は**受け取ったバイト列を一切加工せず**に保存します。`source-catalog.edn` の sha256 が e-Gov が実際に送ってきたものの sha256 であり、下流はこのスクリプトを信用せずに custody を検証できます。
+`bin/fetch.cljk` は**受け取ったバイト列を一切加工せず**に保存します。`source-catalog.edn` の sha256 が e-Gov が実際に送ってきたものの sha256 であり、下流はこのスクリプトを信用せずに custody を検証できます。
