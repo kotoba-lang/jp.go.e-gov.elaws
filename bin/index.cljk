@@ -1,4 +1,4 @@
-#!/usr/bin/env nbb
+#!/usr/bin/env kbb
 ;; Derives the small, git-tracked index/ layer from the large, annexed raw/
 ;; layer.
 ;;
@@ -13,7 +13,7 @@
 ;; index is a few MB of text in git; the text itself is fetched on demand by
 ;; sha256. global-legislation-datoms consumes index/ only.
 ;;
-;; Usage: nbb --classpath bin bin/index.cljk
+;; Usage: kbb --backend sci --classpath bin bin/index.cljk
 (ns index
   (:require [lib :refer [log write-edn! sha256-file file-size mkdirp!]]
             [clojure.string :as str]))
