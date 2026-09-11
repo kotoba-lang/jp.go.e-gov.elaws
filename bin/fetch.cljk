@@ -1,4 +1,4 @@
-#!/usr/bin/env nbb
+#!/usr/bin/env kbb
 ;; Preserves the e-Gov 法令API v2 corpus verbatim into raw/.
 ;;
 ;;   raw/law-list.json        — every page of GET /api/2/laws, concatenated
@@ -14,7 +14,7 @@
 ;; Resumable: an already-present raw/laws/<id>.json is skipped, so an
 ;; interrupted run costs only the requests it had not yet made.
 ;;
-;; Usage: nbb --classpath bin bin/fetch.cljk [--pool N] [--limit N]
+;; Usage: kbb --backend sci --classpath bin bin/fetch.cljk [--pool N] [--limit N]
 (ns fetch
   (:require [lib :refer [fetch-buffer log mkdirp! exists? write-file! pooled
                          sleep file-size]]

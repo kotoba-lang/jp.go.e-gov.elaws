@@ -56,8 +56,8 @@ e-Gov 法令API の利用は **政府標準利用規約（第2.0版）**＝ CC B
 ## 再取得 / 再生成
 
 ```bash
-nbb --classpath bin bin/fetch.cljk --pool 3   # raw/ を取得（検証済みの既存ファイルは skip、中断しても再開可）
-nbb --classpath bin bin/index.cljk            # index/ と raw/source-catalog.edn を再生成
+kbb --backend sci --classpath bin bin/fetch.cljk --pool 3   # raw/ を取得（検証済みの既存ファイルは skip、中断しても再開可）
+kbb --backend sci --classpath bin bin/index.cljk            # index/ と raw/source-catalog.edn を再生成
 ```
 
 **pool は 3 以下にしてください。** pool 6 でソフト 404 が大量発生しました（上記）。検証があるので今は静かに壊れませんが、その分リトライで遅くなります。残った失敗は `--pool 1` で再実行すると大半が埋まります（実測: 82 → 13）。
